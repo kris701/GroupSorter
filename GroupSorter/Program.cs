@@ -12,6 +12,8 @@ namespace GroupSorter
         {
             GroupSorter groupSorter = new GroupSorter();
             groupSorter.Run();
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey();
         }
     }
 }
