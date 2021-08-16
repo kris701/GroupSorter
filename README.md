@@ -22,6 +22,7 @@ It contains some general settings to limit the sorting algorithm a bit:
   * None: Dont do anything
   * EqualiseGroups: Adjusting the satisfaction of a group depending on how equal their size is. This will make more "equal" sized groups.
 * ShowAll: Shows all the itterations if true, instead of just the possible ones that was better than the last one.
+* Runs: How many randomized runs to make (adds additional randomisaton to the algorithm)
 
 ### Step 3
 Take a look in the `input.csv` file, also next to the executable.
