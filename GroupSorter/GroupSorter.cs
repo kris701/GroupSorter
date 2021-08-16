@@ -46,9 +46,12 @@ namespace GroupSorter
 
         public void Run()
         {
+            Console.Title = "Group Sorter v. 1.1";
             Console.WriteLine(" === All possible combinations === ");
 
             SplitGroups();
+
+            Console.Title = "Group Sorter v. 1.1";
 
             GetSatisfaction(BestCombination);
 
