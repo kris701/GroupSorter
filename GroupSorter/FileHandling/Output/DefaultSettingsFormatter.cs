@@ -23,6 +23,7 @@ namespace GroupSorter.FileHandling.Output
             csv.AppendLine($"NumberOfGroups{Seperator}{input.NumberOfGroups}{Seperator}");
             csv.AppendLine($"OptimiseType{Seperator}{input.OptimiseType}{Seperator}");
             csv.AppendLine($"ShowAll{Seperator}{input.ShowAll}{Seperator}");
+            csv.AppendLine($"Runs{Seperator}{input.Runs}{Seperator}");
 
             WriteToFile(csv.ToString());
         }

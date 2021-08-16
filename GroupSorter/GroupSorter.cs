@@ -16,7 +16,7 @@ namespace GroupSorter
         public List<Group> BestCombination = new List<Group>();
         public int BestSatisfaction { get; set; } = 0;
         public bool IsAnyFound { get; internal set; }
-        public int Itteration { get; internal set; }
+        public int Iterations { get; internal set; }
 
         public string CSVInputFilePath { get; } = "input.csv";
         public string CSVOutputFilePath { get; } = "output.csv";
@@ -50,6 +50,8 @@ namespace GroupSorter
 
             SplitGroups();
 
+            GetSatisfaction(BestCombination);
+
             BestGroupOutputFormatter bestGroupOutputFormatter = new BestGroupOutputFormatter(Settings, CSVOutputFilePath, ";");
             bestGroupOutputFormatter.Format(BestCombination);
 
@@ -57,7 +59,7 @@ namespace GroupSorter
 
             if (IsAnyFound)
             {
-                Console.WriteLine(" === Best combination possible === ");
+                Console.WriteLine($" === Best combination possible out of {Iterations} iterations === ");
                 PrintLists(BestCombination, 0);
             }
             else
@@ -66,52 +68,79 @@ namespace GroupSorter
 
         private void SplitGroups()
         {
-            List<Group> baseGroup = GenerateLeftMostGroup();
-            int groupIndex = baseGroup.Count - 1;
+            var FPSwatch = System.Diagnostics.Stopwatch.StartNew();
+            int FPSNumberOfIterations = 1;
 
-            while (baseGroup[0].GroupMembers.Count != ListOfPeople.Count - Settings.NumberOfGroups - 1)
+            for (int i = 0; i < Settings.Runs; i++)
             {
-                // Move to the group index with more than 1 member in left
-                // And that the group below has more than 1 member left
-                while (baseGroup[groupIndex].GroupMembers.Count == 1 && baseGroup[groupIndex - 1].GroupMembers.Count == 1)
-                    groupIndex--;
+                Random rand = new Random();
+                ListOfPeople = ListOfPeople.OrderBy(x => rand.Next())
+                  .ToDictionary(item => item.Key, item => item.Value);
 
-                // Check if current indexed group has more than one member
-                // If it does, move that member down, and run next itteration
-                if (baseGroup[groupIndex].GroupMembers.Count != 1)
+                List<Group> baseGroup = GenerateLeftMostGroup();
+                int groupIndex = baseGroup.Count - 1;
+
+                while (baseGroup[0].GroupMembers.Count != ListOfPeople.Count - Settings.NumberOfGroups + 1)
                 {
-                    MovePersonToGroup(baseGroup[groupIndex], baseGroup[groupIndex - 1], baseGroup[groupIndex].GroupMembers.Keys.First());
+                    // Move to the group index with more than 1 member in left
+                    // And that the group below has more than 1 member left
+                    while (baseGroup[groupIndex].GroupMembers.Count == 1 && baseGroup[groupIndex - 1].GroupMembers.Count == 1)
+                        groupIndex--;
+
+                    // Check if current indexed group has more than one member
+                    // If it does, move that member down, and run next itteration
+                    if (baseGroup[groupIndex].GroupMembers.Count != 1)
+                    {
+                        MovePersonToGroup(baseGroup[groupIndex], baseGroup[groupIndex - 1], baseGroup[groupIndex].GroupMembers.Keys.First());
+                    }
+                    else
+                    {
+                        // If then there is only 1 member left in the group, regroup by moving one member down and the rest to the first group
+                        MovePersonToGroup(baseGroup[groupIndex - 1], baseGroup[groupIndex - 2], baseGroup[groupIndex - 1].GroupMembers.Keys.First());
+                        while (groupIndex != baseGroup.Count)
+                        {
+                            while (baseGroup[groupIndex - 1].GroupMembers.Count != 1)
+                                MovePersonToGroup(baseGroup[groupIndex - 1], baseGroup[groupIndex], baseGroup[groupIndex - 1].GroupMembers.Keys.Last());
+                            groupIndex++;
+                        }
+                    }
+                    // Reset the group index
+                    groupIndex = baseGroup.Count - 1;
+
+                    // Set best group if this current configuration is better than the one that is saved
+                    CheckAndSetBestGroup(baseGroup);
+
+                    if (Settings.ShowAll)
+                        PrintLists(baseGroup, Iterations);
+
+                    Iterations++;
+
+                    if (FPSwatch.ElapsedMilliseconds >= 1000)
+                    {
+                        Console.Title = "Frames per Second: " + (Iterations - FPSNumberOfIterations);
+                        FPSNumberOfIterations = Iterations;
+                        FPSwatch.Restart();
+                    }
                 }
-                else
-                {
-                    // If then there is only 1 member left in the group, regroup by moving one member down and the rest to the first group
-                    MovePersonToGroup(baseGroup[groupIndex - 1], baseGroup[groupIndex - 2], baseGroup[groupIndex - 1].GroupMembers.Keys.First());
-                    while (baseGroup[groupIndex - 1].GroupMembers.Count != 1)
-                        MovePersonToGroup(baseGroup[groupIndex - 1], baseGroup[baseGroup.Count - 1], baseGroup[groupIndex - 1].GroupMembers.Keys.First());
-                }
-                // Reset the group index
-                groupIndex = baseGroup.Count - 1;
-
-                // Set best group if this current configuration is better than the one that is saved
-                CheckAndSetBestGroup(baseGroup);
-
-                if (Settings.ShowAll)
-                    PrintLists(baseGroup, Itteration);
-
-                Itteration++;
             }
         }
 
         private List<Group> GenerateLeftMostGroup() {
+            Dictionary<int, Person> keyValuePairs = new Dictionary<int, Person>(ListOfPeople);
             List<Group> baseGroup = new List<Group>();
             for (int i = 0; i < Settings.NumberOfGroups; i++)
             {
                 Group newGroup = new Group();
-                newGroup.GroupMembers.Add(i, ListOfPeople[i]);
+
+                newGroup.GroupMembers.Add(keyValuePairs.First().Value.ID, keyValuePairs.First().Value);
+                keyValuePairs.Remove(keyValuePairs.First().Value.ID);
                 baseGroup.Add(newGroup);
             }
             for (int i = Settings.NumberOfGroups; i < ListOfPeople.Count; i++)
-                baseGroup[Settings.NumberOfGroups - 1].GroupMembers.Add(i, ListOfPeople[i]);
+            {
+                baseGroup[Settings.NumberOfGroups - 1].GroupMembers.Add(keyValuePairs.First().Value.ID, keyValuePairs.First().Value);
+                keyValuePairs.Remove(keyValuePairs.First().Value.ID);
+            }
 
             return baseGroup;
         }
@@ -125,7 +154,7 @@ namespace GroupSorter
                     BestCombination = baseGroup.ConvertAll(x => x.Clone());
                     BestSatisfaction = GetSatisfaction(BestCombination);
                     if (!Settings.ShowAll)
-                        PrintLists(baseGroup, Itteration);
+                        PrintLists(baseGroup, Iterations);
                     IsAnyFound = true;
                 }
             }
@@ -182,7 +211,7 @@ namespace GroupSorter
                 sb.Append("[ ");
                 foreach (Person p in InnerList.GroupMembers.Values)
                 {
-                    sb.Append($"{p.ID}, ");
+                    sb.Append($"{p.Name}, ");
                 }
                 sb.Append("] ");
             }

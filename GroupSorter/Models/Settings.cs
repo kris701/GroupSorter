@@ -16,5 +16,6 @@ namespace GroupSorter
         public int OptimalGroupSize { get; set; } = 5;
         public OptimiseTypes OptimiseType { get; set; } = OptimiseTypes.EqualiseGroups;
         public bool ShowAll { get; set; } = false;
+        public int Runs { get; set; } = 1000;
     }
 }

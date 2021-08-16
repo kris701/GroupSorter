@@ -46,6 +46,8 @@ namespace GroupSorter.FileHandling.Input
                             else
                                 newSettings.ShowAll = false;
                         }
+                        if (s[0].ToUpper() == "RUNS")
+                            newSettings.Runs = Int32.Parse(s[1]);
                     }
                     ID++;
                 }

@@ -9,13 +9,16 @@ namespace GroupSorter
     public class Person : ICloneable<Person>
     {
         public Person() { }
-        public Person(int iD, string name, int preference1ID, int preference2ID, int preference3ID)
+
+        public Person(int iD, string name, int preference1ID, int preference2ID, int preference3ID, int preferedGroupMembersCount, int gotGroupMembersCount)
         {
             ID = iD;
             Name = name;
             Preference1ID = preference1ID;
             Preference2ID = preference2ID;
             Preference3ID = preference3ID;
+            PreferedGroupMembersCount = preferedGroupMembersCount;
+            GotGroupMembersCount = gotGroupMembersCount;
         }
 
         public int ID { get; set; }
@@ -28,7 +31,7 @@ namespace GroupSorter
 
         public Person Clone()
         {
-            return new Person(ID, Name, Preference1ID, Preference2ID, Preference3ID);
+            return new Person(ID, Name, Preference1ID, Preference2ID, Preference3ID, PreferedGroupMembersCount, GotGroupMembersCount);
         }
     }
 }
