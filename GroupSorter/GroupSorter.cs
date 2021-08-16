@@ -211,7 +211,7 @@ namespace GroupSorter
                 sb.Append("[ ");
                 foreach (Person p in InnerList.GroupMembers.Values)
                 {
-                    sb.Append($"{p.Name}, ");
+                    sb.Append($"{p.ID}, ");
                 }
                 sb.Append("] ");
             }
