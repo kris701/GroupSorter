@@ -22,8 +22,8 @@ namespace GroupSorter.FileHandling.Output
             csv.AppendLine($"MaxGroupSize{Seperator}{input.MaxGroupSize}{Seperator}");
             csv.AppendLine($"NumberOfGroups{Seperator}{input.NumberOfGroups}{Seperator}");
             csv.AppendLine($"OptimiseType{Seperator}{input.OptimiseType}{Seperator}");
-            csv.AppendLine($"ShowAll{Seperator}{input.ShowAll}{Seperator}");
             csv.AppendLine($"Runs{Seperator}{input.Runs}{Seperator}");
+            csv.AppendLine($"Threads{Seperator}{input.Threads}{Seperator}");
 
             WriteToFile(csv.ToString());
         }

@@ -17,6 +17,9 @@ namespace GroupSorter.FileHandling.Output
             var csv = new StringBuilder();
 
             csv.AppendLine($"Id{Seperator}Name{Seperator}Preference1{Seperator}Preference2{Seperator}Preference3{Seperator}");
+            csv.AppendLine($"0{Seperator}a{Seperator}1{Seperator}2{Seperator}{Seperator}");
+            csv.AppendLine($"1{Seperator}b{Seperator}0{Seperator}{Seperator}{Seperator}");
+            csv.AppendLine($"2{Seperator}c{Seperator}1{Seperator}{Seperator}{Seperator}");
 
             WriteToFile(csv.ToString());
         }

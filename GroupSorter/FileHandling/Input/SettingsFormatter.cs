@@ -39,15 +39,10 @@ namespace GroupSorter.FileHandling.Input
                                 default: newSettings.OptimiseType = Settings.OptimiseTypes.None; break;
                             }
                         }
-                        if (s[0].ToUpper() == "SHOWALL")
-                        {
-                            if (s[1].ToUpper() == "TRUE")
-                                newSettings.ShowAll = true;
-                            else
-                                newSettings.ShowAll = false;
-                        }
                         if (s[0].ToUpper() == "RUNS")
                             newSettings.Runs = Int32.Parse(s[1]);
+                        if (s[0].ToUpper() == "THREADS")
+                            newSettings.Threads = Int32.Parse(s[1]);
                     }
                     ID++;
                 }
